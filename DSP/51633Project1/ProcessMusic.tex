@@ -8,7 +8,7 @@
 %% Thsi file based on content from http://www.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/
 
 \documentclass[journal]{IEEEtran}
-\usepackage[cmex10]{amsmath}
+\usepackage{graphicx}
 \begin{document}
 \title{ProcessMusic: A DSP Application Framework}
 
@@ -56,29 +56,65 @@ development and deployment. This paper documents the driving concerns and specif
 It also explores design, capabilities, example applications, and future work. 
 
 \subsection{Goal}
-Subsection text here.
+The goal of this framework is to provide a configurable, performant environment to foster development of new DSP algorithms. 
+Visual debugging tools and simple system configuration are available to minimize the amount of time spent on non-development tasks
+such as testing, bug-fixing, and setup of development tools.   
 
 \subsection{Key Concerns}
-Subsection text here.
 \subsubsection{Performance}
-Subsubsection text here.
+Performance is a difficult topic. What works well on one set of hardware may work poorly or fail completely on another system. Design decisions
+made by other dataflow frameworks can also reduce performance, while gaining data safety and user friendliness. One of the key ideas behind the 
+performance pipeline is to minimize data copying, which can greatly degrade performance of a program. On some modern processors, it can also be 
+faster to keep a set of resentative data and re-apply the transforms on the other side of a data transfer, rather than going back to memory 
+(or worse, disk!). By choosing languages with a history of acceptance in the scientific community, minimizing redundant operations, and designing 
+with paralell operation in mind, intricate code can remain performant enough for large-scale use.
+
 \subsubsection{Visualization}
-Subsubsection text here.
+The availability of visualization tools can maximize gains for time spent during the development process. Being able to make changes to an 
+algorithm and immediately view the results of these changes can allow an engineer to rapidly home in problem areas of a given implementation. 
+Visuals also provide an excellent way to communicate results and design decisions in an easily understandable way.
+
 \subsubsection{Flexibility}
-Subsubsection text here.
+Flexibility is the trademark of many great tools. By designing a tool with maximum flexibility, individuals are able to use existing 
+work to successfully complete tasks that the original design never considered. This trait also requires careful consideration during the design
+stage, as too much flexibility often hurts performance, and vice-versa.
 
 \section{Design}
-Subsection text here.
+Design of this framework involved the concept of four separate "stages" of processing: configuration, data acquisition, static processing, and 
+dynamic processing. The dynamic and static processing stages are designed to intertwine, but the current implementation occurs as a 
+linear sequence of events. A configurable option to continously repeat the dynamic section is also shown in Figure 1.
+\begin{figure}[h!]
+\centering
+  \includegraphics[width=0.45\textwidth]{fig1.png}
+\end{figure}
 
 \subsection{Implementation}
-Subsection text here.
-\subsubsection{C++}
-Subsection text here.
-\subsubsection{Python}
-Subsection text here.
+The implementation of these blocks is done using two primary languages (C++ and Python) and a host of libraries and modules. As of now, the bulk
+of the effort is in C++. Hopefully, applications will reuse the C++ codebase, while the Python toolkit expands for new applications.
 
-\section{Capabilities}
-Subsection text here.
+\subsubsection{C++}
+The configuration, data acquisition, and static processing stages are all accomplished using C++. Configuration uses libconfig, which 
+has it's own syntax for configuration files. These configurations files are read in when a program begins in order to configure blocks and 
+components. Data acquisition currently has two options: WAV file input and mp3 encoded file input. Depending on the extension of the named file, 
+data is stripped using libmpg123 ifor mp3s, or libsndfile for WAV format. Eventually, the data acquisition stage will also include the ability to processes streams of data, as well as CSV and raw binary files. Once the initial timeseries data is obtained, it is loaded into a block which will travel through the entire processing chain, gaining new entries as the data is transformed end manipulated. 
+
+Next, static processing is applied to the data, using compiled blocks of processing code. Currently, the static blocks available perform FFTs, 
+Cepstral Transforms, Bark Frequency Cepstral Coefficients, and DCTs. These blocks use libfftw3 and the Eigen template library to perform 
+fourier transforms and matrix operations. Once the static processing chain has completed, the data and it's tranform representations are 
+loaded into a Python interpreter, which then exposes the computed arrays directly to a configured list of Python scripts to be executed in the dynamic
+stage.
+
+\subsubsection{Python}
+The Python sections allow a high-level, interactive interface to the data and it's representative transforms. Often, advanced statistical modeling, 
+plotting routines, and complex analysis are performed in this stage. Most of these operations take advantage of the wide variety of scientific 
+and mathematical packages available for Python. There are also configurable options to run the dynamic stage repeatedly, which allows developers to change the Python scripts and immediately see the results of these changes, without having to redo the expensive data transform computations.
+
+\subsubsection{Diagram}
+The system specification shown in Figure 1 can now be represented with implemenation boundaries, as in Figure 2.
+\begin{figure}[h!]
+\centering
+  \includegraphics[width=0.45\textwidth]{fig2.png}
+\end{figure}
 
 \subsection{Processing}
 \subsubsection{Optional File Decompression}
@@ -94,21 +130,11 @@ Subsection text here.
 \subsubsection{Gaussian Mixture Modeling}
 Subsection text here.
 
-\subsection{Development}
-\subsubsection{Automation}
-Subsection text here.
-\subsubsection{Visualization}
-Subsection text here.
-\subsubsection{Configuration}
-Subsection text here.
-
 \section{Applications}
 Subsection text here.
 
 \section{Future Work}
 Subsection text here.
-\subsection{DSP}
-\subsection{Software Capabilities}
 
 \section{Conclusion}
 The conclusion goes here.
