@@ -8,7 +8,9 @@
 %% Thsi file based on content from http://www.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/
 
 \documentclass[journal]{IEEEtran}
+\usepackage[labelfont=bf]{caption}
 \usepackage{graphicx}
+\usepackage{amsmath}
 \begin{document}
 \title{ProcessMusic: A DSP Application Framework}
 
@@ -86,6 +88,7 @@ linear sequence of events. A configurable option to continously repeat the dynam
 \begin{figure}[h!]
 \centering
   \includegraphics[width=0.45\textwidth]{fig1.png}
+\caption{System design in four stages}
 \end{figure}
 
 \subsection{Implementation}
@@ -114,21 +117,45 @@ The system specification shown in Figure 1 can now be represented with implemena
 \begin{figure}[h!]
 \centering
   \includegraphics[width=0.45\textwidth]{fig2.png}
+\caption{System implementation with boundaries}
 \end{figure}
 
 \subsection{Processing}
-\subsubsection{Optional File Decompression}
-Subsection text here.
-\subsubsection{FFT and Power Density}
-Subsection text here.
+\subsubsection{FFT and Power Spectral Density}
+To understand the FFT, it is important to first describe the DFT, the mathematical equation on which the FFT algorithm is based.
+The basic DFT can be represented by Equation 1
+\begin{equation}
+X_k = \sum_{n=0}^{N-1}x_ne^{\frac{-j2k\pi}{N}};k = 0,...,N-1
+\end{equation}
+
+The FFT is a mathematical transformation of the DFT which reduces the number of computations required to compute the result. 
+Functionally, the DFT and FFT are equivalent. The FFTW library used in this framework attempts to combine many different FFT algorithms into
+ an optimum plan for a particular set of data, given an expected FFT length and number of FFTs to compute.
+
+Once the FFT is completed, the PSD is also calculated using Equation 2
+\begin{equation}
+X_k = 20\log_{10}(\sqrt{real(x_k)^2 + imag(x_k)^2})
+\end{equation}
+
 \subsubsection{Cepstrum}
-Subsection text here
+The cepstrum is the FFT of the PSD of a given set of data. It can be thought of as an operation to see the frequency of the envelope of
+ frequency components. The cepstrum captures both time and frequency information, but the additional layer of abstraction can cause confusion in 
+visualization and interpretation. The signal, once transformed, is represented in the the quefrency domain, and analysis in this domain is 
+often used for speech processing.
+
 \subsubsection{DCT}
-Subsection text here.
+The DCT and the DFT are highly related to each other - in fact, the DCT can be considered a direct subset of the DFT. By removing the sine components
+of a DFT computation, the DCT is performed. There are many different fomulations for the DCT, represent in roman numerals I-VIII. The most widely
+used equation for the DCT, DCT(II), is represented in Equation 3
+\begin{equation}
+X_k = \sum_{n=0}^{N-1}x_n\cos(\frac{(n + \frac{1}{2})\pi k}{N});k = 0,...,N-1
+\end{equation}
 \subsubsection{Bark Filter Bank}
 Subsection text here.
 \subsubsection{Gaussian Mixture Modeling}
 Subsection text here.
+
+\section{Usage}
 
 \section{Applications}
 Subsection text here.
