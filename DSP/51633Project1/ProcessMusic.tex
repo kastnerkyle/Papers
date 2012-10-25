@@ -9,6 +9,7 @@
 
 \documentclass[journal]{IEEEtran}
 \usepackage[labelfont=bf]{caption}
+\captionsetup[figure]{labelformat=parens}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \begin{document}
@@ -123,7 +124,7 @@ The system specification shown in Figure 1 can now be represented with implemena
 \subsection{Processing}
 \subsubsection{FFT and Power Spectral Density}
 To understand the FFT, it is important to first describe the DFT, the mathematical equation on which the FFT algorithm is based.
-The basic DFT can be represented by Equation 1
+The basic DFT can be represented by Equation 1. \cite{DSPBook}
 \begin{equation}
 X_k = \sum_{n=0}^{N-1}x_ne^{\frac{-j2k\pi}{N}};k = 0,...,N-1
 \end{equation}
@@ -132,7 +133,7 @@ The FFT is a mathematical transformation of the DFT which reduces the number of 
 Functionally, the DFT and FFT are equivalent. The FFTW library used in this framework attempts to combine many different FFT algorithms into
  an optimum plan for a particular set of data, given an expected FFT length and number of FFTs to compute.
 
-Once the FFT is completed, the PSD is also calculated using Equation 2
+Once the FFT is completed, the PSD is also calculated using Equation 2. \cite{DSPBook}
 \begin{equation}
 X_k = 20\log_{10}(\sqrt{real(x_k)^2 + imag(x_k)^2})
 \end{equation}
@@ -141,60 +142,52 @@ X_k = 20\log_{10}(\sqrt{real(x_k)^2 + imag(x_k)^2})
 The cepstrum is the FFT of the PSD of a given set of data. It can be thought of as an operation to see the frequency of the envelope of
  frequency components. The cepstrum captures both time and frequency information, but the additional layer of abstraction can cause confusion in 
 visualization and interpretation. The signal, once transformed, is represented in the the quefrency domain, and analysis in this domain is 
-often used for speech processing.
+often used for speech processing. \cite{DSPBook, AudioBook}
 
 \subsubsection{DCT}
 The DCT and the DFT are highly related to each other - in fact, the DCT can be considered a direct subset of the DFT. By removing the sine components
 of a DFT computation, the DCT is performed. There are many different fomulations for the DCT, represent in roman numerals I-VIII. The most widely
-used equation for the DCT, DCT(II), is represented in Equation 3
+used equation for the DCT, DCT(II), is represented in Equation 3. \cite{DSPBook}
 \begin{equation}
 X_k = \sum_{n=0}^{N-1}x_n\cos(\frac{(n + \frac{1}{2})\pi k}{N});k = 0,...,N-1
 \end{equation}
+
 \subsubsection{Bark Filter Bank}
-Subsection text here.
-\subsubsection{Gaussian Mixture Modeling}
-Subsection text here.
+A bark filter is one of a class of nonlinear filters which model the physical characteristics of hearing. This filter can be conceptualized in 
+the frequency domain as a series of log-spaced overlapping triangles. It can also be represented as shown in Figure 3.
+\begin{figure}[h!]
+\centering
+  \includegraphics[width=0.45\textwidth]{fig3.png}
+\caption{Visual representation of bark filter \cite{AudioBook}}
+\end{figure}
 
-\section{Usage}
+Efficient implementation of the bark filter can be accomplished in the frequency domain, using matrix multiplication as below.
+\begin{equation}
+BC_{PxM} = FFT_{PxN}xBF_{NxM}; with FFT=FFT result matrix, BF=Frequency bark filter matrix, BC=Bark frequency coefficients, N=FFT length, P=(Data length/FFT length), M=Number of bark coefficients (typically 25)
+\end{equation}
 
-\section{Applications}
-Subsection text here.
+\section{Images}
 
 \section{Future Work}
-Subsection text here.
+There are many improvements to be made to this toolkit. Near future improvements include an interface for streaming data, additional configuration
+parameters, more dynamic processing tools, the ability to splice static and dynamic processing stages, and the addition of a polyphase filter block
+to the static processing tools, using the FFT overlap-save method. Possible further extensions include making the data stream more dynamic, 
+lowering the memory usage of the application, and adding support for static processing tools implemented in CUDA.
 
 \section{Conclusion}
-The conclusion goes here.
-
-% if have a single appendix:
-%\appendix[Proof of the Zonklar Equations]
-% or
-%\appendix  % for no appendix heading
-% do not use \section anymore after \appendix, only \section*
-% is possibly needed
-
-% use appendices with more than one appendix
-% then use \section to start each appendix
-% you must declare a \section before using any
-% \subsection or using \label (\appendices by itself
-% starts a section numbered zero.)
-%
-
-\appendices
-\section{Proof of the First Zonklar Equation}
-Appendix one text goes here.
-
-% you can choose not to have a title for an appendix
-% if you want by leaving the argument blank
-\section{Continued Proof}
-Appendix two text goes here.
+Computers grow more and more complex, and great research often requires an extensive knowledge about computer operation and software development. Many researchers are unhappy focusing time and effort on the study of these tools, instead of their preferred
+application. By providing a well-structured framework for accomplishing common tasks, time spent researching can be focused exploring research 
+topics, instead of reimplementing existing ideas for each project.
 
 \begin{thebibliography}{1}
+\bibitem{DSPBook}
+A. Oppenheim, R. Schafer, and J. Buck, \emph{Discrete Time Signal Processing}, 2nd Edition. Prentice-Hall, 1999.
 
-\bibitem{IEEEhowto:kopka}
-H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
-  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+\bibitem{AudioBook}
+J. Smith, \emph{Spectral Audio Signal Processing}. W3K Publishing, 2011
 
+\bibitem{BarkPaper}
+J. Smith and J. Abel, \emph{Bark and ERB Bilinear Tranforms}, IEEE Transactions on Speech and Audio Processing, November, 1999.
 \end{thebibliography}
 
 % if you will not have a photo at all:
