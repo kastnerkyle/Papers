@@ -14,7 +14,7 @@
 \usepackage{amsmath}
 \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
 \begin{document}
-\title{ProcessMusic: A DSP Application Framework}
+\title{QuDSP: A Quick DSP Application Framework}
 
 \author{Kyle Kastner and Johanna Hansen}%
 
@@ -36,7 +36,7 @@ interface for visualization and high-level computation, in order to bridge the g
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-Python, C++, DSP, Numpy.
+Framework, Dataflow, Python, C++, DSP, Numpy.
 \end{IEEEkeywords}
 
 \IEEEpeerreviewmaketitle
@@ -163,13 +163,13 @@ the frequency domain as a series of log-spaced overlapping triangles. It can als
 \end{figure}
 
 Efficient implementation of the bark filter can be accomplished in the frequency domain, using matrix multiplication as below.
-
+\begin{small}
 \begin{align}
 \begin{bmatrix}
 B_{1,1} & \cdots & B_{1,C} \\
 \vdots & \ddots & \vdots \\
 B_{M,1} & \cdots & B_{M,C} 
-\end{bmatrix} = \\ 
+\end{bmatrix} = \nonumber \\ 
 \begin{bmatrix}
 T_{1,1} & \cdots & T_{1,N} \\
 \vdots & \ddots & \vdots \\
@@ -179,11 +179,14 @@ T_{M,1} & \cdots & T_{M,N}
 F_{1,1} & \cdots & F_{1,C} \\
 \vdots & \ddots & \vdots \\
 F_{N,C} & \cdots & F_{N,C}
-\end{bmatrix} \numberthis  
+\end{bmatrix} 
 \end{align}
+\end{small}
+
 \textbf{\emph{T}} is the FFT results matrix 
 
-\textbf{\emph{F}} is a repeated Bark filter with \begin{math}F_{1,1}=F_{2,1}...=F_{N,1}\end{math}
+\textbf{\emph{F}} is a repeated Bark filter; with all rows identical i.e.
+\begin{align}F_{1,1}=F_{2,1}...=F_{N,1} \nonumber \end{align}
 
 \textbf{\emph{B}} contains the resulting Bark frequency coefficients
 
@@ -191,9 +194,24 @@ F_{N,C} & \cdots & F_{N,C}
 
 \begin{math}N\end{math}=Number of FFT bins
 
-\begin{math}M\end{math}=\begin{math}\frac{datalen}{fftlen}\end{math}
+\begin{math}M\end{math}=\begin{math}\frac{datalen}{fftlen}\end{math}; Number of FFT frames contained in data
 
 \section{Images}
+Figure 4 and Figure 5 show time series and frequency displays, respectively, from one of the dynamic processing blocks. For displaying data in
+ the dynamic processing stage, the Python modules matplotlib and pylab are used. Note that the spectral display has not been shifted, 
+so zero frequency is in the center of the graph.
+
+\begin{figure}[h!]
+\centering
+  \includegraphics[width=0.45\textwidth]{fig4.png}
+\caption{Time series display}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+  \includegraphics[width=0.45\textwidth]{fig5.png}
+\caption{Spectral display}
+\end{figure}
 
 \section{Future Work}
 There are many improvements to be made to this toolkit. Near future improvements include an interface for streaming data, additional configuration
@@ -218,13 +236,15 @@ J. Smith and J. Abel, \emph{Bark and ERB Bilinear Tranforms}, IEEE Transactions 
 \end{thebibliography}
 
 % if you will not have a photo at all:
-\begin{IEEEbiographynophoto}{Kyle Kastner}
-Kyle Kastner works at Southwest Research Institute, Division 16.
-\end{IEEEbiographynophoto}
+%\begin{IEEEbiographynophoto}{Kyle Kastner}
+%Kyle is a graduate of Texas State University, B.S.E.E., who is currently pursuing an M.S.E.E at University of Texas-San Antonio.
+%Research areas include powerline communications, cognitive radio, music classification and radiolocation techniques.
+%He is curently employed by Southwest Research Institute, Division 16. 
+%\end{IEEEbiographynophoto}
 
-\begin{IEEEbiographynophoto}{Johanna Hansen}
-Johanna Hansen works at Southwest Research Institute, Division 10.
-\end{IEEEbiographynophoto}
+%\begin{IEEEbiographynophoto}{Johanna Hansen}
+%Johanna Hansen works at Southwest Research Institute, Division 10.
+%\end{IEEEbiographynophoto}
 
 % You can push biographies down or up by placing
 % a \vfill before or after them. The appropriate
