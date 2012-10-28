@@ -43,7 +43,7 @@ Framework, Dataflow, Python, C++, DSP, Numpy.
 \section{Introduction}
 \IEEEPARstart{T}{he fields} of digital signal processing and software development are highly related. As computing power
 grows, the amount of data to process also grows larger. Algorithms become increasingly more elaborate, and the amount of time, knowledge,
-and effort necessary to create a useful application has begun to eclipse the cost for hardware itself.
+and effort necessary to create a useful application can be extreme.
 
 \subsection{Background}
 Work in DSP often requires both standard debugging tools and expert verification of the processing stages involved 
@@ -51,7 +51,7 @@ in the data pipeline. As a result, algorithm development and deployment tend to 
 First, the algorithm is developed in a high-level language such as MATLAB or Python, using tools for visualization 
 and basic debugging in order to verify the operations work as expected. Next, the same application is ported to a low-level compiled
 language, in order to meet the performance required for most DSP applications. During this translation, many new and
-unforseen bugs occur, lengthening development time, and increasing project complexity. 
+unforseen bugs can occur, lengthening development time and increasing project complexity. 
 
 \subsection{Overview}
 By combining performant data processing code blocks and a high-level scripting interface into a unified toolkit, it 
@@ -103,7 +103,7 @@ has it's own syntax for configuration files. These configurations files are read
 components. Data acquisition currently has two options: WAV file input and mp3 encoded file input. Depending on the extension of the named file, 
 data is stripped using libmpg123 ifor mp3s, or libsndfile for WAV format. Eventually, the data acquisition stage will also include the ability to processes streams of data, as well as CSV and raw binary files. Once the initial timeseries data is obtained, it is loaded into a block which will travel through the entire processing chain, gaining new entries as the data is transformed end manipulated. 
 
-Next, static processing is applied to the data, using compiled blocks of processing code. Currently, the static blocks available perform FFTs, 
+Next, static processing is applied to the data using compiled blocks of processing code. Currently, the static blocks available perform FFTs, 
 Cepstral Transforms, Bark Frequency Cepstral Coefficients, and DCTs. These blocks use libfftw3 and the Eigen template library to perform 
 fourier transforms and matrix operations. Once the static processing chain has completed, the data and it's tranform representations are 
 loaded into a Python interpreter, which then exposes the computed arrays directly to a configured list of Python scripts to be executed in the dynamic
@@ -156,6 +156,7 @@ X_k = \sum_{n=0}^{N-1}x_n\cos(\frac{(n + \frac{1}{2})\pi k}{N});k = 0,...,N-1
 \subsubsection{Bark Filter Bank}
 A bark filter is one of a class of nonlinear filters which model the physical characteristics of hearing. This filter can be conceptualized in 
 the frequency domain as a series of log-spaced overlapping triangles. It can also be represented as shown in Figure 3.
+
 \begin{figure}[h!]
 \centering
   \includegraphics[width=0.45\textwidth]{fig3.png}
