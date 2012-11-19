@@ -1,0 +1,144 @@
+%% ProcessMusic.tex
+%% V0.1
+%% 2012/10/23
+%% by Kyle Kastner
+%%
+%% requires IEEEtran.cls version 1.7 or later
+%% Thsi file based on content from http://www.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/
+
+\documentclass[journal]{IEEEtran}
+\usepackage[labelfont=bf]{caption}
+\captionsetup[figure]{labelformat=parens}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+\begin{document}
+\title{A Comparison of Quantization Methods}
+
+\author{Kyle Kastner and Johanna Hansen}%
+
+\markboth{Project 2: Quantization}{}
+\maketitle
+
+\begin{abstract}
+Quantization is an important technique in modern communication and data systems. Linear, non-linear, and vector quantization
+implementations have different characteristics and implementation concerns. Quantifying the differences in performance 
+and implementation complexity, we show some of the tradeoffs between each of these quantization methods.
+\end{abstract}
+% IEEEtran.cls defaults to using nonbold math in the Abstract.
+% This preserves the distinction between vectors and scalars. However,
+% if the journal you are submitting to favors bold math in the abstract,
+% then you can use LaTeX's standard command \boldmath at the very start
+% of the abstract to achieve this. Many IEEE journals frown on math
+% in the abstract anyway.
+
+% Note that keywords are not normally used for peerreview papers.
+\begin{IEEEkeywords}
+Quantization, vector, $\mu$-law, k-means.
+\end{IEEEkeywords}
+
+\IEEEpeerreviewmaketitle
+\section{Introduction}
+\IEEEPARstart{Q}{uantization} methods are crucial to modern technology. Quantization techniques have fueled 
+advancements in communications, computing, and data processing. In this paper, we will compare linear and non-linear 
+quantization methods at various bit levels, and discuss the complexities associated with each technique.
+
+\subsection{Background}
+Conveying information with minimal data has been and continues to be an important part of technology and research. Passwords, 
+military codes, cellular communications, and compression are either in whole or in part based on this concept. One of the simplest ways
+to achieve data reduction is to eliminate data that does not transmit useful information. This elimination, done correctly, can 
+greatly reduce the amount of data required to transmit information, such as words in a conversation.
+
+\subsection{Overview}
+Several different methods of quantization will be shown and compared in the following pages. Implementations of linear, 
+$\mu$-law, and vector quantizers were run against different audio files, generating results for mean squared error and 
+signal to noise ratio. We also take special care to discuss the implementation details of each quantization type.
+
+\subsection{Goal}
+Our goal in this paper is to identify different ways to perform quantization, compare the performance of each method discussed, show 
+implementation examples for each, and discuss the engineering trade-offs associated with choosing a particular quantization scheme.
+
+\section{Error}
+Quantization is considered a "lossy" scheme, which means that during the quantization operation, data is thrown out and cannot
+be recovered. This data may or may not contain useful information about the signal being quantized. When data is lost, error is
+introduced, known as quantization error. Given a sampled input $x_n$, quantization error can be shown as \cite{DSPBook}
+\begin{equation}
+x_q = x_n + e_n
+\end{equation}
+where $e_n$ is the quantization error. Quantizer performance will be measured by comparing the error introduced by different methods
+while holding system inputs and parameters fixed. Two basic measurements convey the amount of error introduced, Mean Squared Error (MSE)
+and SNR (Signal To Noise Ratio).
+
+\section{Linear Quantization}
+\subsection{Formulation}
+Linear quantization is the simplest method for aplying quantization to a signal. The linear quantizer can be implemented as a sample
+and hold operation in hardware, or by the integer division method available in most computer languages. For an input sample $x_n$, the
+linear quantizer can be formulated as follows \cite{DSPBook}
+\begin{equation}
+    x_q = int(\frac{x_n}{\alpha}) 
+\end{equation}
+with $\alpha$
+\begin{equation}
+    \alpha = \frac{x_{max} - x_{min}}{2^B}
+\end{equation}
+where $B$ is the number of quantization bits.
+
+\subsection{Performance}
+The linear quantizer has near-zero computational overhead, and with a relatively large number of quantization bits or a narrow 
+dynamic range, quantization error can be fairly low. However, the linear quantizer is a poor choice for many systems, as there are
+alternatives which introduce less quantization error for the same system parameters $x_{max}$, $x_{min}$, and $B$.
+
+\subsection{Visualization}
+
+The image above shows an example of linear quantization, applied to an audio file containing speech. 
+\section{Non-linear Quantization}
+\subsection{Formulation}
+\subsection{Performance}
+\subsection{Visualization}
+\section{Vector Quantization}
+\subsection{Formulation}
+\subsubsection{k-means Initialization}
+\subsection{Performance}
+\subsection{Visualization}
+
+\section{Comparison}
+\section{Future Work}
+\section{Conclusion}
+\begin{thebibliography}{1}
+\bibitem{DSPBook}
+A. Oppenheim, R. Schafer, and J. Buck, \emph{Discrete Time Signal Processing}, 2nd Edition. Prentice-Hall, 1999.
+
+\bibitem{AudioBook}
+J. Smith, \emph{Spectral Audio Signal Processing}. W3K Publishing, 2011
+
+\bibitem{BarkPaper}
+J. Smith and J. Abel, \emph{Bark and ERB Bilinear Transforms}, IEEE Transactions on Speech and Audio Processing, November, 1999.
+\end{thebibliography}
+
+% if you will not have a photo at all:
+%\begin{IEEEbiographynophoto}{Kyle Kastner}
+%Kyle is a graduate of Texas State University, B.S.E.E., who is currently pursuing an M.S.E.E at University of Texas-San Antonio.
+%Research areas include powerline communications, cognitive radio, music classification and radiolocation techniques.
+%He is curently employed by Southwest Research Institute, Division 16. 
+%\end{IEEEbiographynophoto}
+
+%\begin{IEEEbiographynophoto}{Johanna Hansen}
+%Johanna Hansen works at Southwest Research Institute, Division 10.
+%\end{IEEEbiographynophoto}
+
+% You can push biographies down or up by placing
+% a \vfill before or after them. The appropriate
+% use of \vfill depends on what kind of text is
+% on the last page and whether or not the columns
+% are being equalized.
+
+%\vfill
+
+% Can be used to pull up biographies so that the bottom of the last one
+% is flush with the other column.
+%\enlargethispage{-5in}
+
+% that's all folks
+\end{document}
+
+
