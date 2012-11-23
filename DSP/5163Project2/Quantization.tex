@@ -186,7 +186,8 @@ After a data point is assigned to a given centroid, the centroid value is update
 \begin{equation}
     \forall x \in {x_c}, c_n = c_n(1-\alpha) + x\alpha, n = 1..k, 0 < \alpha < 1
 \end{equation}
-Here $x_c$ represents the set of values associated with each cluster by the previous assignment stage.
+Here $x_c$ represents the set of values associated with each cluster by the previous assignment stage, and $\alpha = \frac{1}{v}$, where $v$
+is roughly the amount of data to "remember" during the update stage. A value of $\alpha = 0.01$ was used for this testing.
 Once all data has been processed, each value associated with a cluster centroid is set to the value of that centroid. \cite{meansWeb}
 
 \subsection{Performance}
