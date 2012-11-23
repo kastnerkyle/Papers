@@ -63,7 +63,7 @@ Quantization is considered a "lossy" scheme, which means that during the quantiz
 be recovered. This data may or may not contain useful information about the signal being quantized. When data is lost, error is
 introduced, known as quantization error. Given a sampled input $x_n$, quantization error can be shown as \cite{DSPBook}
 \begin{equation}
-x_q = x_n + e_n
+    x_q = x_n + e_n
 \end{equation}
 where $e_n$ is the quantization error. Quantizer performance will be measured by comparing the error introduced by different methods
 while holding system inputs and parameters fixed. Two basic measurements convey the amount of error introduced, Mean Squared Error (MSE)
@@ -75,11 +75,8 @@ Linear quantization is the simplest method for aplying quantization to a signal.
 and hold operation in hardware, or by the integer division method available in most computer languages. For an input sample $x_n$, the
 linear quantizer can be formulated as follows \cite{DSPBook}
 \begin{equation}
-    x_q = int(\frac{x_n}{\alpha}) 
-\end{equation}
-with $\alpha$
-\begin{equation}
-    \alpha = \frac{x_{max} - x_{min}}{2^B}
+    x_q = int(\frac{x_n*2^B}{x_{max} - x_{min}}) 
+    \label{eq:linear}
 \end{equation}
 where $B$ is the number of quantization bits.
 
@@ -91,21 +88,66 @@ alternatives which introduce less quantization error for the same system paramet
 \subsection{Visualization}
 \begin{figure}[h!]
 \centering
-  \includegraphics[width=0.45\textwidth]{linear_4bit.png}
-\caption{Linear quantization}
+  \includegraphics[width=0.45\textwidth]{linear_6bit.png}
+\caption{Linear quantization, $B = 6$}
+\label{fig:linear}
 \end{figure}
-The image in Fig. 1 shows an example of linear quantization, applied to an audio file containing speech. 
+The image in Figure \ref{fig:linear} shows an example of linear quantization, applied to an audio file containing speech. 
 
 \section{Non-linear Quantization}
-\subsection{Formulation}
-\subsection{Performance}
-\subsection{Visualization}
-\section{Vector Quantization}
-\subsection{Formulation}
-\subsubsection{k-means Initialization}
-\subsection{Performance}
-\subsection{Visualization}
+Non-linear quantization covers a wide variety of quantization techniques. One of the most common non-linear quantizers is based on the 
+$\mu$-law algorithm, which uses logarithmic formulas to map input to a compressed domain (companding), apply a linear quantizer, then
+invert the companding stage (expanding) in order to perform non-linear quantization. There are other methods of non-linear quantization that use
+different algorithms, such as the $A$-law formula or specialized formulas for specific data types. 
 
+\subsection{Formulation}
+The companding stage of the $\mu$-law quantizer uses the following formula \cite{CiscoWeb}:
+\begin{equation}
+    x_q = \frac{ln(1 + \mu \lvert x_n \rvert)}{ln(1 + \mu)}sign(x_n), -1 \le x_n \le 1  
+\end{equation}
+
+Linear expansion as in Equation \ref{eq:linear} is applied, then an inversion formula is applied, where  
+\begin{equation}
+    y_n = \frac{1}{\mu}((1-\mu)^{\lvert y_q \rvert}-1), -1 \le y_q \le 1
+\end{equation}
+shows the inversion formula.
+
+\subsection{Performance}
+The $\mu$-law quantizer adds a minimal amount computational overhead, in exchange for superior error rates for commonly quantized data types
+(music, speech, etc.). The $\mu$-law quantizer can be extended to an adaptive $\mu$-law quantizer, or combined with the $A$-law quantizer to
+form a switching adaptive scheme.
+
+\subsection{Visualization}
+\begin{figure}[h!]
+\centering
+  \includegraphics[width=0.45\textwidth]{mu_6bit.png}
+\caption{$\mu$-law quantization, $B = 6$, $\mu = 255$}
+\label{fig:linear}
+\end{figure}
+
+\section{Vector Quantization}
+Vector quantization can be seen as a further extension of non-linear quantization. Rather than assigning boundaries based on a set formula, the 
+vector quantizer uses k-means clustering of an example data set to intelligently set bit boundaries. There are many issues to be dealt with 
+when implementing the k-means clustering section of the vector quantizer, which will be discussed in the sections below.
+\subsection{k-means Initialization}
+K-means clustering is a technique for associating a set of values with $k$ cluster centroids, where $k$ is a predefined integer. This works very well for 
+quantization, as the value for $B$ is pre-determined, which means $k = 2^B$. To perform clustering, there are two primary stages: initialization, 
+and association. K-means clustering is extremely sensitive to initialization, and there are several different ways to perform the initialization stage. 
+\subsubsection{Value Initialization}
+Value initialization is the simplest way to initialize k-means centroids.
+\begin{equation}
+    c_n = V, n = 1...k
+\end{equation}
+Examples for $V$ include $0$, the mean of the data set, the median of the data set, or the mode of the dataset.
+
+\subsection{Linear Initialization}
+\subsection{Probabilistic Methods}
+\subsubsection{Forgy Method}
+\subsubsection{Unknown Distribution Sampling}
+\subsection{Sculptor's Method}
+\subsection{Formulation}
+\subsection{Performance}
+\subsection{Visualization}
 \section{Comparison}
 \section{Future Work}
 \section{Conclusion}
@@ -113,11 +155,9 @@ The image in Fig. 1 shows an example of linear quantization, applied to an audio
 \bibitem{DSPBook}
 A. Oppenheim, R. Schafer, and J. Buck, \emph{Discrete Time Signal Processing}, 2nd Edition. Prentice-Hall, 1999.
 
-\bibitem{AudioBook}
-J. Smith, \emph{Spectral Audio Signal Processing}. W3K Publishing, 2011
+\bibitem{CiscoWeb}
+Cisco, \emph{Waveform Coding Techniques}. Retrieved November, 2012. http://www.cisco.com/en/US/tech/tk1077/technologies\_tech\_note09186a00801149b3.shtml 
 
-\bibitem{BarkPaper}
-J. Smith and J. Abel, \emph{Bark and ERB Bilinear Transforms}, IEEE Transactions on Speech and Audio Processing, November, 1999.
 \end{thebibliography}
 
 % if you will not have a photo at all:
