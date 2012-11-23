@@ -4,13 +4,14 @@
 %% by Kyle Kastner
 %%
 %% requires IEEEtran.cls version 1.7 or later
-%% Thsi file based on content from http://www.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/
+%% This file based on content from http://www.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/
 
 \documentclass[journal]{IEEEtran}
 \usepackage[labelfont=bf]{caption}
 \captionsetup[figure]{labelformat=parens}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{flushend}
 \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
 \begin{document}
 \title{A Comparison of Quantization Methods}
@@ -23,7 +24,7 @@
 \begin{abstract}
 Quantization is an important technique in modern communication and data systems. Linear, non-linear, and vector quantization
 implementations have different characteristics and implementation concerns. Quantifying the differences in performance, and discussing 
-the implementation issues associated with each technique, we show some of the tradeoffs made when choosing one of these quantization methods.
+the implementation issues associated with each technique, we show some of the trade offs made when choosing one of these quantization methods.
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
 % This preserves the distinction between vectors and scalars. However,
@@ -71,7 +72,7 @@ and SNR (Signal To Noise Ratio).
 
 \section{Linear Quantization}
 \subsection{Formulation}
-Linear quantization is the simplest method for aplying quantization to a signal. The linear quantizer can be implemented as a sample
+Linear quantization is the simplest method for applying quantization to a signal. The linear quantizer can be implemented as a sample
 and hold operation in hardware, or by the integer division method available in most computer languages. For an input sample $x_n$, the
 linear quantizer can be formulated as follows \cite{DSPBook}
 \begin{equation}
@@ -122,7 +123,7 @@ form a switching adaptive scheme.
 \centering
   \includegraphics[width=0.45\textwidth]{mu_6bit.png}
 \caption{$\mu$-law quantization, $B = 6$, $\mu = 255$}
-\label{fig:linear}
+\label{fig:mu}
 \end{figure}
 
 \section{Vector Quantization}
@@ -140,7 +141,7 @@ Value initialization is the simplest way to initialize k-means centroids.
 \begin{equation}
     c_n = V, n = 1...k
 \end{equation}
-Examples for $V$ include $0$, the mean of the data set, the median of the data set, or the mode of the dataset.
+Examples for $V$ include $0$, the mean of the data set, the median of the data set, or the mode of the data set.
 
 \subsection{Linear Initialization}
 Linear initialization uses a similar approach to the linear quantizer, seen in Equation \ref{eq:linear}, to set centroid cluster values.
@@ -164,8 +165,8 @@ paper. The implementation of these two algorithms is outside the scope of this p
 The Sculptor's method is a new method developed during work on this paper. While testing the different ways of initializing the k-means centroids, there
 seemed to be large performance differences between the repeatable methods (Value, Linear) and the probabilistic techniques (Forgy, Rejection, 
 Metropolis-Hastings). Unfortunately, probabilistic methods are difficult to test and quantify, due to the sensitivity of the k-means algorithm to
-initialization. A repeatable method for initialization which provides performance approaching that of the proababilistic methods is desired. 
-A method based on a center(s) of mass calculation was considered, but further exploration led to the creation of the 
+initialization. A repeatable method for initialization which provides performance approaching that of the probabilistic methods is desired. 
+Method based on a center(s) of mass calculation were considered, but further exploration led to the creation of the 
 Sculptor's method, formulated below.
 \begin{equation}
     c_n = x_{min} + \frac{n(x_{max}-x_{min})}{2^B}\frac{\sum_{i=0}^{n}count(x_{min}+i)}{n}, n = 1...k 
@@ -199,7 +200,7 @@ to keep the system causal.
 \centering
   \includegraphics[width=0.45\textwidth]{vector_6bit.png}
 \caption{Vector quantization, $B = 6$, $init = Sculptor's$}
-\label{fig:linear}
+\label{fig:vector}
 \end{figure}
 
 \section{Comparison}
@@ -214,7 +215,9 @@ The two measurements used to compare the various quantization schemes discussed 
     SNR = 10log(\frac{\sigma_x}{\sigma_q})
     \label{eq:SNR}
 \end{equation}
-Applying these metrics to each of the quantization schemes, the following figures were generated. 
+The files used for this testing, as well as generation of Figures \ref{fig:linear},\ref{fig:mu},\ref{fig:vector}, were found at \cite{sourceWeb}. These
+particular tests were run against the "OSR\_us\_000\_0010\_8k.wav" file, though other speech files from this site show similar results. Applying the
+measurements to each of the quantization schemes, the following figures were generated. 
 \begin{figure}[h!]
 \centering
   \includegraphics[width=0.45\textwidth]{NRMSE_all.png}
@@ -224,7 +227,7 @@ Applying these metrics to each of the quantization schemes, the following figure
 \begin{figure}[h!]
 \centering
   \includegraphics[width=0.45\textwidth]{NRMSE_nolinear.png}
-\caption{Normalized Root Mean Squared Error, exluding linear quantization}
+\caption{Normalized Root Mean Squared Error, excluding linear quantization}
 \label{fig:NRMSE_nolinear}
 \end{figure}
 \begin{figure}[h!]
@@ -235,8 +238,8 @@ Applying these metrics to each of the quantization schemes, the following figure
 \end{figure}
 \begin{figure}[h!]
 \centering
-  \includegraphics[width=0.45\textwidth]{NRMSE_all.png}
-\caption{Signal To Noise Ratio, exluding linear quantization}
+  \includegraphics[width=0.45\textwidth]{SNR_nolinear.png}
+\caption{Signal To Noise Ratio, excluding linear quantization}
 \label{fig:SNR_nolinear}
 \end{figure}
 
@@ -248,6 +251,12 @@ $A$-law quantizer, and adaptive quantization schemes would add breadth to the te
 various methods.
 
 \section{Conclusion}
+This paper explored various algorithms for quantization. Using Normalized Root Mean Squared Error and Signal to Noise ratio measurements, 
+linear, non-linear, and vector quantizers were compared for English speech data. A new type of initialization for vector quantizers, named
+the Sculptor's method, was introduced. This method offers repeatable output, simplicity, and performance, and seems to compare favourably with 
+existing techniques for vector quantization initialization. Readers of this paper should find the information here helpful in determining which
+quantization methods are most appropriate for a given system.
+
 \begin{thebibliography}{1}
 \bibitem{DSPBook}
 A. Oppenheim, R. Schafer, and J. Buck, \emph{Discrete Time Signal Processing}, 2nd Edition. Prentice-Hall, 1999.
@@ -260,6 +269,10 @@ A. Gelman, J. Carlin, H. Stern, D. Rubin, \emph{Bayesian Data Analysis}, 2nd Edi
 
 \bibitem{meansWeb}
 S. Lloyd, "Least squares quantization in PCM", \emph{IEEE Transactions on Information Theory}. Volume 28, Issue 2, 1982.
+
+\bibitem{sourceWeb}
+"OSR\_us\_000\_0010\_8k.wav", \emph{Open Speech Repository}, American English. Telchemy Incorporated, Retrieved November, 2012.  
+http://www.voiptroubleshooter.com/open\_speech/american.html 
 \end{thebibliography}
 
 % if you will not have a photo at all:
