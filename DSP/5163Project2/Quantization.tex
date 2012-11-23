@@ -22,8 +22,8 @@
 
 \begin{abstract}
 Quantization is an important technique in modern communication and data systems. Linear, non-linear, and vector quantization
-implementations have different characteristics and implementation concerns. Quantifying the differences in performance 
-and implementation complexity, we show some of the tradeoffs between each of these quantization methods.
+implementations have different characteristics and implementation concerns. Quantifying the differences in performance, and discussing 
+the implementation issues associated with each technique, we show some of the tradeoffs made when choosing one of these quantization methods.
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
 % This preserves the distinction between vectors and scalars. However,
@@ -34,7 +34,7 @@ and implementation complexity, we show some of the tradeoffs between each of the
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-Quantization, vector, $\mu$-law, k-means.
+Quantization, linear, vector, $\mu$-law, k-means.
 \end{IEEEkeywords}
 
 \IEEEpeerreviewmaketitle
@@ -129,10 +129,12 @@ form a switching adaptive scheme.
 Vector quantization can be seen as a further extension of non-linear quantization. Rather than assigning boundaries based on a set formula, the 
 vector quantizer uses k-means clustering of an example data set to intelligently set bit boundaries. There are many issues to be dealt with 
 when implementing the k-means clustering section of the vector quantizer, which will be discussed in the sections below.
-\subsection{k-means Initialization}
+
+\subsection{K-means Initialization}
 K-means clustering is a technique for associating a set of values with $k$ cluster centroids, where $k$ is a predefined integer. This works very well for 
 quantization, as the value for $B$ is pre-determined, which means $k = 2^B$. To perform clustering, there are two primary stages: initialization, 
 and association. K-means clustering is extremely sensitive to initialization, and there are several different ways to perform the initialization stage. 
+
 \subsubsection{Value Initialization}
 Value initialization is the simplest way to initialize k-means centroids.
 \begin{equation}
@@ -141,10 +143,37 @@ Value initialization is the simplest way to initialize k-means centroids.
 Examples for $V$ include $0$, the mean of the data set, the median of the data set, or the mode of the dataset.
 
 \subsection{Linear Initialization}
+Linear initialization uses a similar approach to the linear quantizer, seen in Equation \ref{eq:linear}, to set centroid cluster values.
+\begin{equation}
+    c_n = x_{min} + \frac{n(x_{max} - x_{min})}{2^B}, n = 1...k 
+\end{equation}
+
 \subsection{Probabilistic Methods}
 \subsubsection{Forgy Method}
+The Forgy method for initialization takes $k$ samples at random from the data set, and uses those values to initialize the k-means centroids.
+\begin{equation}
+   c_n = X, X \in \{x_1...x_n\}, n = 1...k
+\end{equation}
+
 \subsubsection{Unknown Distribution Sampling}
+The set of data to be quantized can be thought of as data with an unknown distribution. There are several techniques for sampling from unknown
+distributions, including the rejection sampling and Metropolis-Hastings sampling techniques, which are the two techniques used for comparison in this
+paper. The implementation of these two algorithms is outside the scope of this paper, but more information can be found in \cite{BayesianBook}.
+
 \subsection{Sculptor's Method}
+The Sculptor's method is a new method developed during work on this paper. While testing the different ways of initializing the k-means centroids, there
+seemed to be large performance differences between the repeatable methods (Value, Linear) and the probabilistic techniques (Forgy, Rejection, 
+Metropolis-Hastings). A method based on a center(s) of mass calculation was considered, but some further exploration led to the creation of the 
+Sculptor's method, formulated below.
+\begin{equation}
+    c_n = x_{min} + \frac{n(x_{max}-x_{min})}{2^B}\frac{\sum_{i=0}^{n}count(x_{min}+i)}{n}, n = 1...k 
+\end{equation}
+
+If one imagines the linear initialization method as a flat piece of clay, with lines evenly spaced across the length, then the placement of
+centroids for the Sculptor's method can be found by compressing or expanding different sections of the clay. Compressing sections will decrease the
+distances between lines, while stretching the clay will increase distance between lines. By thinking of the histogram of data as a "map" of pressure
+applied to the clay, we can that the distance between lines is inversely proportional to the summed count of values per bin (histogram area).
+
 \subsection{Formulation}
 \subsection{Performance}
 \subsection{Visualization}
@@ -158,6 +187,8 @@ A. Oppenheim, R. Schafer, and J. Buck, \emph{Discrete Time Signal Processing}, 2
 \bibitem{CiscoWeb}
 Cisco, \emph{Waveform Coding Techniques}. Retrieved November, 2012. http://www.cisco.com/en/US/tech/tk1077/technologies\_tech\_note09186a00801149b3.shtml 
 
+\bibitem{BayesianBook}
+A. Gelman, J. Carlin, H. Stern, D. Rubin, \emph{Bayesian Data Analysis}, 2nd Edition. CRC Press, 2004.
 \end{thebibliography}
 
 % if you will not have a photo at all:
