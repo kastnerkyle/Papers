@@ -66,7 +66,7 @@ introduced, known as quantization error. Given a sampled input $x_n$, quantizati
     x_q = x_n + e_n
 \end{equation}
 where $e_n$ is the quantization error. Quantizer performance will be measured by comparing the error introduced by different methods
-while holding system inputs and parameters fixed. Two basic measurements convey the amount of error introduced, Mean Squared Error (MSE)
+while holding system inputs and parameters fixed. Two basic measurements convey the amount of error introduced, Normalized Root Mean Squared Error (NRMSE)
 and SNR (Signal To Noise Ratio).
 
 \section{Linear Quantization}
@@ -152,7 +152,7 @@ Linear initialization uses a similar approach to the linear quantizer, seen in E
 \subsubsection{Forgy Method}
 The Forgy method for initialization takes $k$ samples at random from the data set, and uses those values to initialize the k-means centroids.
 \begin{equation}
-   c_n = X, X \in \{x_1...x_n\}, n = 1...k
+    c_n = \emph{X}, \emph{X} \in \{x_1...x_n\}, n = 1...k
 \end{equation}
 
 \subsubsection{Unknown Distribution Sampling}
@@ -163,22 +163,90 @@ paper. The implementation of these two algorithms is outside the scope of this p
 \subsection{Sculptor's Method}
 The Sculptor's method is a new method developed during work on this paper. While testing the different ways of initializing the k-means centroids, there
 seemed to be large performance differences between the repeatable methods (Value, Linear) and the probabilistic techniques (Forgy, Rejection, 
-Metropolis-Hastings). A method based on a center(s) of mass calculation was considered, but some further exploration led to the creation of the 
+Metropolis-Hastings). Unfortunately, probabilistic methods are difficult to test and quantify, due to the sensitivity of the k-means algorithm to
+initialization. A repeatable method for initialization which provides performance approaching that of the proababilistic methods is desired. 
+A method based on a center(s) of mass calculation was considered, but further exploration led to the creation of the 
 Sculptor's method, formulated below.
 \begin{equation}
     c_n = x_{min} + \frac{n(x_{max}-x_{min})}{2^B}\frac{\sum_{i=0}^{n}count(x_{min}+i)}{n}, n = 1...k 
 \end{equation}
-
 If one imagines the linear initialization method as a flat piece of clay, with lines evenly spaced across the length, then the placement of
 centroids for the Sculptor's method can be found by compressing or expanding different sections of the clay. Compressing sections will decrease the
 distances between lines, while stretching the clay will increase distance between lines. By thinking of the histogram of data as a "map" of pressure
-applied to the clay, we can that the distance between lines is inversely proportional to the summed count of values per bin (histogram area).
+applied to the clay, the distance between lines is inversely proportional to the summed count of values per bin (histogram area).
 
 \subsection{Formulation}
+Once initialization is completed through some method, the k-means algorithm iterates through each point in the data set, assigning each data point to a
+centroid.
+\begin{equation}
+    x_c = min((x_q - c_n)^2), n = 1...k
+\end{equation}
+After a data point is assigned to a given centroid, the centroid value is updated.
+\begin{equation}
+    \forall x \in {x_c}, c_n = c_n(1-\alpha) + x\alpha, n = 1..k, 0 < \alpha < 1
+\end{equation}
+Here $x_c$ represents the set of values associated with each cluster by the previous assignment stage.
+Once all data has been processed, each value associated with a cluster centroid is set to the value of that centroid. \cite{meansWeb}
+
 \subsection{Performance}
+Vector quantization has much more overhead than the previously discussed linear and non-linear techniques. Implementation is more complex, and 
+there is a wide performance difference which depends on the initialization of k-means centroids. However, basing quantization levels on the content
+of the data instead of an what the content is expected to be has some performance benefits, at the cost of introducing a large amount of delay in order
+to keep the system causal.
+
 \subsection{Visualization}
+\begin{figure}[h!]
+\centering
+  \includegraphics[width=0.45\textwidth]{vector_6bit.png}
+\caption{Vector quantization, $B = 6$, $init = Sculptor's$}
+\label{fig:linear}
+\end{figure}
+
 \section{Comparison}
+The two measurements used to compare the various quantization schemes discussed above were Normalized Root Mean Squared Error (NRMSE), shown in Equation
+\ref{eq:NRMSE}, and Signal to Noise Ratio (SNR), shown in Equation \ref{eq:SNR}. \cite{DSPBook}
+\begin{equation}
+    NRMSE = \frac{\sum_{i=0}^n (x_n - q_n)^2}{n}, n = length(x)
+    \label{eq:NRMSE}
+\end{equation}
+
+\begin{equation}
+    SNR = 10log(\frac{\sigma_x}{\sigma_q})
+    \label{eq:SNR}
+\end{equation}
+Applying these metrics to each of the quantization schemes, the following figures were generated. 
+\begin{figure}[h!]
+\centering
+  \includegraphics[width=0.45\textwidth]{NRMSE_all.png}
+\caption{Normalized Root Mean Squared Error}
+\label{fig:NRMSE_all}
+\end{figure}
+\begin{figure}[h!]
+\centering
+  \includegraphics[width=0.45\textwidth]{NRMSE_nolinear.png}
+\caption{Normalized Root Mean Squared Error, exluding linear quantization}
+\label{fig:NRMSE_nolinear}
+\end{figure}
+\begin{figure}[h!]
+\centering
+  \includegraphics[width=0.45\textwidth]{SNR_all.png}
+\caption{Signal To Noise Ratio}
+\label{fig:SNR_all}
+\end{figure}
+\begin{figure}[h!]
+\centering
+  \includegraphics[width=0.45\textwidth]{NRMSE_all.png}
+\caption{Signal To Noise Ratio, exluding linear quantization}
+\label{fig:SNR_nolinear}
+\end{figure}
+
 \section{Future Work}
+More exploration and testing of the Sculptor's method is necessary. Testing against data sets besides speech data, as well as a larger sample set for
+quantifying the performance of the probabilistic methods, will go a long way toward validating the results of this initial exploration. There is also 
+room to test the Sculptor's method, without follow on k-means clustering, as a different method for non-linear quantization. Implementations of the 
+$A$-law quantizer, and adaptive quantization schemes would add breadth to the test coverage, and allow for more accurate comparisons between the 
+various methods.
+
 \section{Conclusion}
 \begin{thebibliography}{1}
 \bibitem{DSPBook}
@@ -189,6 +257,9 @@ Cisco, \emph{Waveform Coding Techniques}. Retrieved November, 2012. http://www.c
 
 \bibitem{BayesianBook}
 A. Gelman, J. Carlin, H. Stern, D. Rubin, \emph{Bayesian Data Analysis}, 2nd Edition. CRC Press, 2004.
+
+\bibitem{meansWeb}
+S. Lloyd, "Least squares quantization in PCM", \emph{IEEE Transactions on Information Theory}. Volume 28, Issue 2, 1982.
 \end{thebibliography}
 
 % if you will not have a photo at all:
