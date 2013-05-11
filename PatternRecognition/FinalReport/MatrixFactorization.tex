@@ -60,7 +60,7 @@ Eq. \ref{eq:RMSE}) is also used as a quantitative comparison metric.
     RMSE=\sqrt{\frac{\sum\limits^N_{n=1}(x_n-\tilde{x}_{n})^2}{N}}
 \label{eq:RMSE}
 \end{equation}
-A visual representation of the tesing data can be seen in Fig. \ref{fig:lena} and \ref{fig:sparselena}.
+A visual representation of the testing data can be seen in Fig. \ref{fig:lena} and \ref{fig:sparselena}.
 \begin{figure}[h!]
 \centering
     \includegraphics[width=0.45\textwidth]{lena.png}
@@ -75,7 +75,8 @@ A visual representation of the tesing data can be seen in Fig. \ref{fig:lena} an
 \end{figure}
 
 \section{SVD}
-The SVD is a very well known technique in linear algebra, statistics, and signal processing. The SVD is based on eigendecomposition, and is often used 
+The SVD is a very well known technique in linear algebra, statistics, and signal processing. SVD methods are 
+based on eigendecomposition, and often used 
 in a similar manner as principal component analysis (PCA) and linear discriminant analysis (LDA), in order to decompose a matrix into 
 orthogonal basis vectors that describe the row and column components. The goal of SVD is to find a solution to Eq. \ref{eq:SVD} \cite{SVDIntuition}.
 \begin{equation}
@@ -89,7 +90,7 @@ The SVD was originally developed for full-matrix decomposition, but it also func
 The resultant matrices \begin{math}U,V\end{math} are of dimension \begin{math}N \times K\end{math} and \begin{math}K \times N\end{math} respectively, where the number of support parameters
 \begin{math}K\end{math} allows for a tradeoff between computational complexity and reconstruction quality. All computations in this experiment used
 \begin{math}K=10\end{math} for the number of factors per row and column element. Evaluating the SVD on the full and sparse matrix Lena datasets led to 
-Fig. \ref{fig:fullSVD} and \ref{fig:sparseSVD} All algorithms were also evaluated with the number of repetitions \begin{math}R = 7\end{math}.
+Fig. \ref{fig:fullSVD} and \ref{fig:sparseSVD}. All algorithms were also evaluated with the number of repetitions \begin{math}R = 7\end{math}.
 \begin{figure}[h!]
 \centering
     \includegraphics[width=0.45\textwidth]{fullsvd.png}
@@ -104,7 +105,7 @@ Fig. \ref{fig:fullSVD} and \ref{fig:sparseSVD} All algorithms were also evaluate
 \end{figure}
 
 \section{PMF}
-Next, the sparse Lena dataset was evaluated using probabilistic matrix factorization, or PMF. PMF was developed in response to the Netflix
+Next, the sparse Lena dataset was evaluated using probabilistic matrix factorization, or PMF, which was developed in response to the Netflix
 recommendation algorithm competition. This compeition was initiated to find the best recommendation algorithm for Netflix users, 
 given an existing sparse matrix of user, movie recommendations \begin{math}A_{i,j}\end{math}, rows \begin{math}i \in N\end{math} representing movies, 
 and columns \begin{math}j \in M\end{math}
@@ -149,7 +150,7 @@ The results applying PMF to the sparse Lena dataset are shown in Fig. \ref{fig:s
 KPMF, or kernelized probabilistic matrix factorization, is an extension of the PMF algorithm described above. A full derivation can be seen in 
 \cite{KPMFpaper}, but key additions of the KPMF algorithm over PMF are: minimizing a different error function, adding an additional adjacency 
 matrix term to describe the connections between matrix entries, and adding a customizable kernel to describe the strength of these connections. The last
-two modifications allow the incorporation of side information such as social models, spatial models, or custom models for domain specific
+two modifications allow the incorporation of side information such as social connection, spatial similarity, or custom models for domain specific
 problems. This increases the number of free parameters in a problem, but can allow for stronger estimates when measurements are 
 extremely sparse. KPMF is accomplished by minimizing Eq. \ref{eq:KPMFerr}.
 \begin{align}
@@ -173,26 +174,26 @@ This error function is again minimized using gradient descent, resulting in Eq. 
     \frac{\partial E}{\partial U} = -\sum\limits_{i=1}^N\sum\limits_{j=1}^MI_{i,j}(R_{i,j}-U_i^TV_j)V_j + \lambda_U\sum\limits_{i=1}^NS_UU_i
     \label{eq:KPMFgrad}
 \end{equation}
-Most of the terms in Eq. \ref{eq:KPMFgrad} are shared with the derivation of the PMF in Eq. \ref{PMFgrad}, however new terms have emerged: 
+Most of the terms in Eq. \ref{eq:KPMFgrad} are shared with the derivation of the PMF in Eq. \ref{eq:PMFgrad}, however new terms have emerged: 
 \begin{math}S_U, S_V\end{math}. These terms represent precision matrices associated with a generated kernel. There are many different methods for
 generating the kernel matrix, as seen in \cite{KPMFpaper}, but for image applications, the authors indicate a preference for the diffusion
 kernel. To generate a diffusion kernel (and its precision \begin{math}S)\end{math}, begin by creating a band matrix of bandwidth \begin{math}W\end{math},
-which describes how many rows and columns can be considered connected. Various bandwidths were tested during this research, but bandwidth 
+which describes how many neighboring rows and columns are connected. Various bandwidths were tested during this research, but bandwidth 
 \begin{math}2\Delta = W = 10\end{math} is listed in \cite{KPMFpaper}. Generating matrix \begin{math}C\end{math}, it is next necessary to calculate
 the degree matrix \begin{math}D\end{math} of \begin{math}C\end{math}, by summing the columns of \begin{math}C\end{math} and placing the sum on the 
 diagonal, in order to calculate the graph laplacian \cite{Laplacian}.
 \begin{equation}
     L = D - C
 \end{equation}
-With the Laplacian calculated, the next step is to apply the diffusion equation 
+With the Laplacian calculated, the next step is to apply the diffusion equation. 
 \begin{equation}
 K = e^{-\beta L}
 \label{eq:diffusion}
 \end{equation}
-\begin{math}\beta\end{math} is a chosen contant for the strength of connection between adjacent rows and columns. 
-\begin{math}\beta = .5\end{math} was used for this reseach.
+\begin{math}\beta\end{math} is a chosen contant for the strength of connection between adjacent rows and columns, where  
+\begin{math}\beta = .5\end{math} was used for this paper.
 It is important to note that Eq. \ref{eq:diffusion} uses the matrix exponential, not element by element exponentiation. 
-These operations result in a final matrix 
+These operations result in a final matrix \begin{math}K\end{math} 
 \begin{equation}
 K = K_U = K_V
 \end{equation}
@@ -208,7 +209,7 @@ S = S_U = S_V = K^{-1}
 
 \section{Results}
 The resulting RMSE values for PMF and KPMF calculations are shown in Figs. \ref{fig:kernelrmse} and \ref{fig:regdiffrmse}. KPMF shows notable improvement over
-PMF, but a thorough search for optimized paramaters would likely yield better results for both algorithms.
+PMF, but a thorough search for optimized parameters would likely yield better results for both algorithms.
 \begin{figure}[h!]
 \centering
     \includegraphics[width=0.45\textwidth]{kernelrmse.png}
@@ -225,8 +226,8 @@ PMF, but a thorough search for optimized paramaters would likely yield better re
 \section{Comparison}
 In earlier sections, only the prediction output of each algorithm is shown. For images, an extra step can be taken by combining the sparse input and 
 prediction output. If there exists a measured value, it is preferred over the estimation of the algorithm. Everywhere else, the algorithmic prediction
-results are preferred. Combining in this way, Figs. \ref{fig:combinedsparsesvd}, \ref{fig:combinedpmf}, and \ref{fig:combinedkpmf} show
-visual improvement.
+results are preferred. Combining in this way, Figs. \ref{fig:combinedsparsesvd}, \ref{fig:combinedpmf}, and \ref{fig:combinedkpmf} are generated, showing
+marked visual improvement.
 \begin{figure}[h!]
 \centering
     \includegraphics[width=0.45\textwidth]{combinedsparsesvd.png}
@@ -259,9 +260,6 @@ visual improvement.
 %\end{figure}
 %\ref{fig:linear}
 
-\vfill
-\vfill
-\vfill
 \begin{thebibliography}{1}
 \bibitem{RMSE}
 Unknown Author, \emph{Root Mean Square Error}. Taken from http://www.ctec.ufal.br/professor/crfj/\\
