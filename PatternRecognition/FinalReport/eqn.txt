@@ -1,0 +1,7 @@
+\frac{\delta}{\delta U}=\sum\limits_{i=1}^N\sum\limits_{j=1}^MI_{i,j}(R_{i,j}-U_i^TV_j)V_j + \lambda_U\sum\limits_{i=1}^NU_i
+\frac{\delta}{\delta V}=\sum\limits_{i=1}^N\sum\limits_{j=1}^MI_{i,j}(R_{i,j}-U_i^TV_j)U_i^T + \lambda_V\sum\limits_{j=1}^MV_j
+E=\frac{1}{2}\sum\limits_{i=1}^N\sum\limits_{j=1}^MI_{i,j}(R_{i,j}-U_i^TV_j)^2 + \frac{\lambda_U}{2}\sum\limits_{i=1}^N||U_i||_{Fro} + \frac{\lambda_V}{2}\sum\limits_{j=1}^M||V_j||_{Fro} 
+E=\frac{1}{2}\sum\limits_{i=1}^N\sum\limits_{j=1}^MI_{i,j}(R_{i,j}-U_iV_j^T)^2 + \frac{\lambda_U}{2}\sum\limits_{i=1}^NU_i^TS_UU_i + \frac{\lambda_V}{2}\sum\limits_{j=1}^MV_j^TS_VV_j 
+\frac{\delta}{\delta U}=\sum\limits_{i=1}^N\sum\limits_{j=1}^MI_{i,j}(R_{i,j}-U_i^TV_j)V_j + \sum\limits_{i=1}^NS_UU_i
+\frac{\delta}{\delta V}=\sum\limits_{i=1}^N\sum\limits_{j=1}^MI_{i,j}(R_{i,j}-U_i^TV_j)U_i + \sum\limits_{j=1}^MS_VV_j
+
