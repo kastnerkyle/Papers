@@ -1,0 +1,199 @@
+%% ProcessMusic.tex
+%% V0.1
+%% 2012/10/23
+%% by Kyle Kastner
+%%
+%% requires IEEEtran.cls version 1.7 or later
+%% This file based on content from http://www.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/
+
+\documentclass[journal]{IEEEtran}
+\usepackage[labelfont=bf]{caption}
+\captionsetup[figure]{labelformat=parens}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{flushend}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+\begin{document}
+\title{Unlocking The Power of Simple Algorithms}
+
+\author{Kyle Kastner\\University of Texas-San Antonio}
+
+\maketitle
+
+\begin{abstract}
+Hierarchical learning is an area of research which focuses on learning high 
+order representations from low level data. Learning to recognize objects from
+images, recognizing words or syllables from audio, or recognizing poses and 
+movement from video are all good examples of modern hierarchical
+learning research, which is a central focus of the "deep learning" movement
+in the machine learning and computational statistics community.
+In this project, This paper extends research on a two class image recognition 
+problem, which is made up of images featuring cats and
+dogs in various sizes, colors, positions, and locations. Experimentation has
+shown that advanced preprocessing can be extremely helpful in solving this 
+problem, and some recent research on transfer learning (learning from other
+data) has yielded a very powerful, simple new preprocessing technique.
+\end{abstract}
+% IEEEtran.cls defaults to using nonbold math in the Abstract.
+% This preserves the distinction between vectors and scalars. However,
+% if the journal you are submitting to favors bold math in the abstract,
+% then you can use LaTeX's standard command \boldmath at the very start
+% of the abstract to achieve this. Many IEEE journals frown on math
+% in the abstract anyway.
+
+% Note that keywords are not normally used for peerreview papers.
+\begin{IEEEkeywords}
+Convolutional neural network, ImageNet, Asirra, 
+stochastic gradient descent, transfer learning, image processing,
+machine learning 
+\end{IEEEkeywords}
+
+\IEEEpeerreviewmaketitle
+\section{Introduction}
+\IEEEPARstart{V}{ision} research, specifically object recognition, has been an 
+area of active research for many years. Until recently, the field was dominated
+by "classical" techniques for digital signal processing and statistics, which
+used feature engineering techniques to find identifying features which could
+be easily discriminated by statistical algorithms. Over the last decade, 
+the ubiquity of low priced, consumer friendly image and audio recording devices
+coupled with free uploading for all contributors has given sites like
+YouTube more data than past researchers could ever imagine. 
+Coupled with modern computing advances,this one-two punch has allowed machine
+learning researchers to move to the front of the pack in many areas. As the
+focus turns away from algorithms and towards "big data", it is important 
+to remember that good data, with good preprocessing, can allow even very simple
+algorithms to sport incredible performance on many problems.In this paper,
+logistic regression, support vector machines, and deep neural networks coupled
+with a "pseudo convolutional" preprocessing feature (called DeCAF \cite{DeCAF})
+will be put to the test.
+
+\section{Dataset}
+The datasets used for these experiments were the ImageNet dataset 
+\cite{ImageNet}\cite{TorontoImageNet}
+and the Asirra dataset \cite{Asirra}, both of which are comprised of 3 channel
+RGB images, and a single label which describes the contents of the image.
+ImageNet images are large by default with center cropping done on a 224x224 
+pixel region. The Asirra images were rescaled to 224x224 for this experiment,
+in order to approximately match the scale of ImageNet.
+The ImageNet dataset features 1200000 images (~140 GB!) representing 
+one thousand different classes of objects, and is used for many different 
+computer vision challenges every year.
+
+The Asirra dataset used for these experiments features 25000 images, containing
+objects representing the classes listed below.
+\begin{itemize}
+\item cat
+\item dog
+\end{itemize}
+
+\section{Preprocessing}
+After the last project, ZCA \cite{ZCA} appeared to be the best technique to use
+when preparing an image for analysis. However, the recent publication of the 
+DeCAF network \cite{DeCAF} has significantly altered the landscape, and
+provides a large improvement over other methods. DeCAF is both a deep neural
+network and a non-linear preprocessing scheme - it is a full convolutional 
+network, trained on the \emph{entire} ImageNet dataset \cite{TorontoImageNet}.
+Once this network has been learned the bottom 6 layers are frozen and used as
+non-linear preprocessing, with an output vector or 4096. This output can then 
+be used as the feature input to more standard machine learning algorithms.The
+authors of the DeCAF paper have published their trained network weights, which
+means this can be treated as a "black box" feature extractor for images. A 
+secondary benefit is that the \emph{application} of this neural network is not
+computationally intensive, which means the final algorithm chosen for
+discrimination will be the dominant processing cost.
+
+\section{Algorithms}
+Four algorithms have currently been attempted for this problem: logistic
+regression, support vector machines (linear and polynomial), and a four level
+neural network. A comparison of the results will be shown below, but it is 
+important to note that the computational complexity of these methods is in the
+aforementioned order - logistic regression (least), then linear SVM, then 
+polynomial SVM, then neural networks. The first 3 classifiers (with DeCAF net
+preprocessing) were all completed using a 1.6GHz Core 2 Duo laptop 
+(Thinkpad T400), while the neural network required GPU training to complete.
+Key hyperparameters were as follows: logistic regression classifier 
+$\alpha=.1$, linear SVM $C=1.$, polynomial SVM $C=1., degree=3$.
+
+The neural network featured the following parameters:
+\begin{itemize}
+\item Layer sizes: 5000 - 5000 - 5000 - 5000 - 2
+\item Layer types: RectLinear(RL) - RL - RL - RL
+\item Initial learning rate .01, decay .001 per epoch for 250 epochs
+\item Initial momentum .5, ramping to .9 over 250 epochs
+\item Stochastic gradient descent, batch size 128 
+\item Dropout .8, scale 1 for layer 1, each layer after has dropout .5, scale 2
+\item Sparse initialization of 15 random weight units 
+\end{itemize}
+
+\section{Results}
+\begin{tabular}{l*{6}{c}r}
+    Algorithm         & Validation Set Accuracy(\%) \\
+    \hline
+    Logistic Reg.     & 94   \\
+    Linear SVM        & 94.2 \\
+    Polynomial SVM(3) & 96   \\
+    4-Layer NN        & 96.7 \\
+\end{tabular}
+
+These results speak for themselves. Effectively, the DeCAF preprocessing allows
+the simpler algorithms (SVM, logistic regression) to make decisions in a space
+very similar to a neural network, without the training overhead. A further
+comparison of "full network" training versus top layer only will be needed.
+
+\section{Conclusions}
+Preprocessing has always been a key part of building a solid machine learning 
+pipeline, but the addition of DeCAF and other "deep" preprocessors is very
+radical. The ability to get powerful results, with simple algorithms and 
+advanced neural network based preprocessing is a very ingenious idea.
+This idea has strong implications for robotics and vehicles, where the
+complicated preprocessing could be "hard wired" into an FPGA or ASIC, 
+thus allowing a computationally light algorithm on the back end to achieve
+acceptable performance for embedded or battery critical applications.This 
+result also resonates in other fields - if this representation can be 
+learned for images, what about audio or video? So far, there is nothing to
+suggest that this result is unique to images, and there are many research
+avenues to explore.
+
+\begin{thebibliography}{1}
+\bibitem{ImageNet}
+Deng J., \emph{ImageNet: A Large Scale Hierarchical Image Database},
+in Proceedings of The IEEE Conference on Computer Vision and Pattern 
+Recognition (CVPR), Jun. 2009. pp. 248-255.
+\bibitem{TorontoImageNet}
+Krizhevsky A., Sutskever I. and Hinton G. E.
+\emph{ImageNet Classification with Deep Convolutional Neural Networks}
+NIPS 2012: Neural Information Processing Systems.
+\bibitem{Asirra}
+Elson J., Douceur J.R., Howell  J., Saul J., \emph{Asirra: A CAPTCHA 
+that Exploits Interest-Aligned Manual Image Categorization}, in 
+Proceedings of 14th ACM Conference on Computer and Communications Security 
+(CCS), Association for Computing Machinery, Inc., Oct. 2007.
+Subset retrieved from http://www.kaggle.com/c/dogs-vs-cats. 
+\bibitem{ZCA}
+Bell A.J., Sejnowski T.J., \emph{The "Independent Components" of Natural Scenes
+are Edge Filters}, 37(23): 3327-3338, Vision Research, 1997.
+\bibitem{Maxout}
+Goodfellow I., Warde-Farley D., Mirza M., Courville A., Bengio Y., 
+\emph{Maxout Networks}, JMLR WCP 28 (3): 1321-1327, 2013.
+\bibitem{DeCAF}
+Donahue J., Jia Y., Vinyals O., Hoffman J., Zhang N., Tzeng E., Darrell T., 
+\emph{DeCAF: A Deep Convolutional Activation Feature for Generic 
+Visual Recognition}, arXiv 1310.1531, 2013.
+\end{thebibliography}
+
+% You can push biographies down or up by placing
+% a \vfill before or after them. The appropriate
+% use of \vfill depends on what kind of text is
+% on the last page and whether or not the columns
+% are being equalized.
+
+%\vfill
+
+% Can be used to pull up biographies so that the bottom of the last one
+% is flush with the other column.
+
+\enlargethispage{-5in}
+% that's all folks
+\end{document}
+
+
